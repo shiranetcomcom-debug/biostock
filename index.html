@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BioStock</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fb;
+      color: #222;
+    }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    input, textarea, select, button {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>BioStock</h1>
+  <p>バイオ株のメモ管理アプリ</p>
+
+  <div class="card">
+    <label>ティッカー</label>
+    <input id="ticker" placeholder="例：LRMR">
+
+    <label>会社名</label>
+    <input id="company" placeholder="例：Larimar Therapeutics">
+
+    <label>投資判断</label>
+    <select id="status">
+      <option>Watch</option>
+      <option>Buy候補</option>
+      <option>Hold</option>
+      <option>Sell検討</option>
+    </select>
+
+    <label>メモ</label>
+    <textarea id="memo" rows="5" placeholder="カタリスト、Bull/Bear、財務メモなど"></textarea>
+
+    <button onclick="saveMemo()">保存</button>
+  </div>
+
+  <div class="card">
+    <h2>保存内容</h2>
+    <div id="list"></div>
+  </div>
+
+  <script>
+    const list = document.getElementById("list");
+
+    function saveMemo() {
+      const data = {
+        ticker: document.getElementById("ticker").value,
+        company: document.getElementById("company").value,
+        status: document.getElementById("status").value,
+        memo: document.getElementById("memo").value,
+        updatedAt: new Date().toLocaleString()
+      };
+
+      const items = JSON.parse(localStorage.getItem("biostock") || "[]");
+      items.push(data);
+      localStorage.setItem("biostock", JSON.stringify(items));
+
+      document.getElementById("ticker").value = "";
+      document.getElementById("company").value = "";
+      document.getElementById("memo").value = "";
+
+      render();
+    }
+
+    function render() {
+      const items = JSON.parse(localStorage.getItem("biostock") || "[]");
+      list.innerHTML = items.map(item => `
+        <div style="border-top:1px solid #ddd; padding:12px 0;">
+          <strong>${item.ticker}</strong> ${item.company}<br>
+          判断：${item.status}<br>
+          <small>更新：${item.updatedAt}</small>
+          <p>${item.memo}</p>
+        </div>
+      `).join("");
+    }
+
+    render();
+  </script>
+</body>
+</html>
