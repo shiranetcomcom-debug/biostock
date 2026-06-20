@@ -1,152 +1,616 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BioStock</title>
-<style>
-body{margin:0;background:#f6f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-header{padding:18px 16px;background:#fff;border-bottom:1px solid #ddd;position:sticky;top:0}
-main{padding:16px;max-width:760px;margin:auto}
-h1{margin:0;font-size:26px}.sub{color:#667085;margin:4px 0 0;font-size:13px}
-.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px;margin-bottom:14px;box-shadow:0 2px 8px #0001}
-label{display:block;font-weight:700;margin-top:10px;font-size:13px}
-input,select,textarea,button{width:100%;box-sizing:border-box;font-size:16px;margin-top:5px;padding:10px;border-radius:8px;border:1px solid #ccd}
-textarea{min-height:80px}
-button{border:0;background:#2563eb;color:#fff;font-weight:700;margin-top:12px}
-button.gray{background:#e5e7eb;color:#111}
-button.red{background:#fee2e2;color:#b91c1c}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.item{border-top:1px solid #eee;padding:12px 0}
-.ticker{font-size:20px;font-weight:800}
-.badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#edf2ff;color:#1d4ed8;font-size:12px;font-weight:700}
-.memo{white-space:pre-wrap;background:#f8fafc;padding:10px;border-radius:8px;margin-top:8px}
-.small{color:#667085;font-size:12px}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BioStock</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --danger: #dc2626;
+      --green: #14804a;
+      --yellow: #946200;
+      --red: #b42318;
+      --shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.5;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(246, 247, 251, 0.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+
+    @media (min-width: 860px) {
+      .grid {
+        grid-template-columns: 360px minmax(0, 1fr);
+        align-items: start;
+      }
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      margin: 11px 0 5px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #344054;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      padding: 10px 11px;
+      font-size: 16px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 72px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      padding: 10px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #e8eefc;
+      color: #1e3a8a;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    button.primary:active {
+      background: var(--primary-dark);
+    }
+
+    button.danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    button.ghost {
+      background: #eef2f7;
+      color: #334155;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    @media (min-width: 620px) {
+      .tools {
+        grid-template-columns: 1.4fr 0.8fr;
+      }
+    }
+
+    .count {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stock-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stock {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .stock-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .ticker {
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .company {
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .badge {
+      display: inline-block;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #edf2ff;
+      color: #1d4ed8;
+    }
+
+    .badge.buy {
+      background: #dcfce7;
+      color: var(--green);
+    }
+
+    .badge.hold {
+      background: #fef3c7;
+      color: var(--yellow);
+    }
+
+    .badge.sell {
+      background: #fee2e2;
+      color: var(--red);
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin-top: 10px;
+      color: #344054;
+      font-size: 14px;
+    }
+
+    .meta b {
+      color: #111827;
+    }
+
+    .memo-box {
+      margin-top: 8px;
+      padding: 9px;
+      border-radius: 7px;
+      background: #f8fafc;
+      color: #263244;
+      font-size: 14px;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .empty {
+      padding: 18px;
+      text-align: center;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>BioStock</h1>
-  <p class="sub">バイオ株の投資メモ・カタリスト管理</p>
-</header>
-
-<main>
-  <div class="card">
-    <h2 id="formTitle">銘柄を追加</h2>
-    <input type="hidden" id="editId">
-
-    <div class="row">
+  <header>
+    <div class="wrap topbar">
       <div>
-        <label>Ticker</label>
-        <input id="ticker" placeholder="例: LRMR">
+        <h1>BioStock</h1>
+        <p class="subtitle">バイオ株の投資メモ・カタリスト管理</p>
       </div>
-      <div>
-        <label>投資判断</label>
-        <select id="status">
+      <button class="ghost" type="button" onclick="resetForm()">新規</button>
+    </div>
+  </header>
+
+  <main class="wrap grid">
+    <section class="panel">
+      <h2 id="formTitle">銘柄を追加</h2>
+      <input id="editId" type="hidden">
+
+      <div class="row">
+        <div>
+          <label for="ticker">Ticker</label>
+          <input id="ticker" placeholder="例: LRMR">
+        </div>
+        <div>
+          <label for="status">投資判断</label>
+          <select id="status">
+            <option>Watch</option>
+            <option>Buy候補</option>
+            <option>Hold</option>
+            <option>Sell検討</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="company">会社名</label>
+      <input id="company" placeholder="例: Larimar Therapeutics">
+
+      <div class="row">
+        <div>
+          <label for="area">疾患領域</label>
+          <input id="area" placeholder="例: 希少疾患">
+        </div>
+        <div>
+          <label for="pipeline">主力パイプライン</label>
+          <input id="pipeline" placeholder="例: nomlabofusp">
+        </div>
+      </div>
+
+      <label for="catalyst">カタリスト</label>
+      <textarea id="catalyst" placeholder="例: PDUFA、P3 readout、決算、学会発表など"></textarea>
+
+      <label for="bull">Bull材料</label>
+      <textarea id="bull" placeholder="強気材料"></textarea>
+
+      <label for="bear">Bear材料</label>
+      <textarea id="bear" placeholder="弱気材料"></textarea>
+
+      <label for="finance">財務メモ</label>
+      <textarea id="finance" placeholder="cash runway、増資リスク、提携金など"></textarea>
+
+      <label for="buyCondition">買い条件</label>
+      <textarea id="buyCondition" placeholder="例: 増資後、データ確認後、$X以下など"></textarea>
+
+      <label for="memo">自由メモ</label>
+      <textarea id="memo" placeholder="ニュース、考察、次回確認事項など"></textarea>
+
+      <div class="actions">
+        <button class="primary" type="button" onclick="saveStock()">保存</button>
+        <button class="ghost" type="button" onclick="resetForm()">クリア</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>ウォッチリスト</h2>
+      <div class="tools">
+        <input id="search" placeholder="Ticker・会社名・メモを検索" oninput="render()">
+        <select id="filter" onchange="render()">
+          <option value="all">すべて</option>
           <option>Watch</option>
           <option>Buy候補</option>
           <option>Hold</option>
           <option>Sell検討</option>
         </select>
       </div>
-    </div>
 
-    <label>会社名</label>
-    <input id="company" placeholder="例: Larimar Therapeutics">
+      <div class="actions">
+        <button type="button" onclick="exportJson()">JSON書き出し</button>
+        <button type="button" onclick="document.getElementById('importFile').click()">JSON読み込み</button>
+        <input id="importFile" type="file" accept="application/json" onchange="importJson(event)">
+      </div>
 
-    <label>主力パイプライン</label>
-    <input id="pipeline" placeholder="例: nomlabofusp">
+      <p id="count" class="count"></p>
+      <div id="list" class="stock-list"></div>
+    </section>
+  </main>
 
-    <label>カタリスト・Bull/Bear・財務メモ</label>
-    <textarea id="memo" placeholder="例: PDUFA、P3 readout、増資リスク、買い条件など"></textarea>
+  <script>
+    const STORAGE_KEY = "biostock_v2";
+    const fields = [
+      "ticker",
+      "company",
+      "status",
+      "area",
+      "pipeline",
+      "catalyst",
+      "bull",
+      "bear",
+      "finance",
+      "buyCondition",
+      "memo"
+    ];
 
-    <button onclick="saveStock()">保存</button>
-    <button class="gray" onclick="clearForm()">クリア</button>
-  </div>
+    function loadStocks() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      } catch (error) {
+        return [];
+      }
+    }
 
-  <div class="card">
-    <input id="search" placeholder="検索: Ticker・会社名・メモ" oninput="render()">
-    <div id="list"></div>
-  </div>
-</main>
+    function storeStocks(stocks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stocks));
+    }
 
-<script>
-const KEY="biostock_simple";
+    function saveStock() {
+      const ticker = document.getElementById("ticker").value.trim().toUpperCase();
+      if (!ticker) {
+        alert("Tickerを入力してください。");
+        return;
+      }
 
-function load(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
-function store(data){localStorage.setItem(KEY,JSON.stringify(data))}
+      const id = document.getElementById("editId").value || String(Date.now());
+      const stock = {
+        id,
+        updatedAt: new Date().toLocaleString("ja-JP")
+      };
 
-function saveStock(){
-  const id=document.getElementById("editId").value || String(Date.now());
-  const ticker=document.getElementById("ticker").value.trim().toUpperCase();
-  if(!ticker){alert("Tickerを入力してください");return}
+      fields.forEach((field) => {
+        const value = document.getElementById(field).value;
+        stock[field] = field === "ticker" ? value.trim().toUpperCase() : value.trim();
+      });
 
-  const stock={
-    id,
-    ticker,
-    status:document.getElementById("status").value,
-    company:document.getElementById("company").value.trim(),
-    pipeline:document.getElementById("pipeline").value.trim(),
-    memo:document.getElementById("memo").value.trim(),
-    updatedAt:new Date().toLocaleString("ja-JP")
-  };
+      const stocks = loadStocks();
+      const index = stocks.findIndex((item) => item.id === id);
 
-  const data=load();
-  const i=data.findIndex(x=>x.id===id);
-  if(i>=0){data[i]=stock}else{data.push(stock)}
-  data.sort((a,b)=>a.ticker.localeCompare(b.ticker));
-  store(data);
-  clearForm();
-  render();
-}
+      if (index >= 0) {
+        stocks[index] = stock;
+      } else {
+        const duplicateIndex = stocks.findIndex((item) => item.ticker === ticker);
+        if (duplicateIndex >= 0 && confirm(ticker + " は既にあります。上書きしますか？")) {
+          stock.id = stocks[duplicateIndex].id;
+          stocks[duplicateIndex] = stock;
+        } else if (duplicateIndex < 0) {
+          stocks.push(stock);
+        } else {
+          return;
+        }
+      }
 
-function editStock(id){
-  const s=load().find(x=>x.id===id);
-  if(!s)return;
-  document.getElementById("editId").value=s.id;
-  document.getElementById("ticker").value=s.ticker;
-  document.getElementById("status").value=s.status;
-  document.getElementById("company").value=s.company;
-  document.getElementById("pipeline").value=s.pipeline;
-  document.getElementById("memo").value=s.memo;
-  document.getElementById("formTitle").textContent=s.ticker+"を編集";
-  scrollTo(0,0);
-}
+      stocks.sort((a, b) => a.ticker.localeCompare(b.ticker));
+      storeStocks(stocks);
+      resetForm();
+      render();
+    }
 
-function deleteStock(id){
-  if(!confirm("削除しますか？"))return;
-  store(load().filter(x=>x.id!==id));
-  render();
-}
+    function editStock(id) {
+      const stock = loadStocks().find((item) => item.id === id);
+      if (!stock) return;
 
-function clearForm(){
-  document.getElementById("editId").value="";
-  document.getElementById("ticker").value="";
-  document.getElementById("status").value="Watch";
-  document.getElementById("company").value="";
-  document.getElementById("pipeline").value="";
-  document.getElementById("memo").value="";
-  document.getElementById("formTitle").textContent="銘柄を追加";
-}
+      document.getElementById("editId").value = stock.id;
+      fields.forEach((field) => {
+        document.getElementById(field).value = stock[field] || "";
+      });
+      document.getElementById("formTitle").textContent = stock.ticker + "を編集";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
 
-function esc(v){return String(v||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+    function deleteStock(id) {
+      const stocks = loadStocks();
+      const stock = stocks.find((item) => item.id === id);
+      if (!stock) return;
 
-function render(){
-  const q=document.getElementById("search").value.toLowerCase();
-  const data=load().filter(s=>Object.values(s).join(" ").toLowerCase().includes(q));
-  document.getElementById("list").innerHTML=data.length?data.map(s=>`
-    <div class="item">
-      <div class="ticker">${esc(s.ticker)} <span class="badge">${esc(s.status)}</span></div>
-      <div>${esc(s.company)}</div>
-      <div class="small">Pipeline: ${esc(s.pipeline)} / 更新: ${esc(s.updatedAt)}</div>
-      <div class="memo">${esc(s.memo)}</div>
-      <button class="gray" onclick="editStock('${s.id}')">編集</button>
-      <button class="red" onclick="deleteStock('${s.id}')">削除</button>
-    </div>
-  `).join(""):"<p class='small'>まだ銘柄がありません。</p>";
-}
+      if (!confirm(stock.ticker + " を削除しますか？")) return;
+      storeStocks(stocks.filter((item) => item.id !== id));
+      render();
+      resetForm();
+    }
 
-render();
-</script>
+    function resetForm() {
+      document.getElementById("editId").value = "";
+      fields.forEach((field) => {
+        document.getElementById(field).value = field === "status" ? "Watch" : "";
+      });
+      document.getElementById("formTitle").textContent = "銘柄を追加";
+    }
+
+    function render() {
+      const query = document.getElementById("search").value.trim().toLowerCase();
+      const filter = document.getElementById("filter").value;
+      const stocks = loadStocks();
+
+      const filtered = stocks.filter((stock) => {
+        const matchesFilter = filter === "all" || stock.status === filter;
+        const haystack = Object.values(stock).join(" ").toLowerCase();
+        return matchesFilter && haystack.includes(query);
+      });
+
+      document.getElementById("count").textContent =
+        filtered.length + "件表示 / 全" + stocks.length + "件";
+
+      const list = document.getElementById("list");
+      if (filtered.length === 0) {
+        list.innerHTML = '<div class="empty">該当する銘柄はありません。</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map((stock) => cardHtml(stock)).join("");
+    }
+
+    function cardHtml(stock) {
+      const badgeClass = statusClass(stock.status);
+      return `
+        <article class="stock">
+          <div class="stock-head">
+            <div>
+              <div class="ticker">${escapeHtml(stock.ticker)}</div>
+              <div class="company">${escapeHtml(stock.company || "")}</div>
+            </div>
+            <span class="badge ${badgeClass}">${escapeHtml(stock.status || "Watch")}</span>
+          </div>
+          <div class="meta">
+            ${line("疾患領域", stock.area)}
+            ${line("主力パイプライン", stock.pipeline)}
+            ${line("カタリスト", stock.catalyst)}
+            ${line("Bull", stock.bull)}
+            ${line("Bear", stock.bear)}
+            ${line("財務", stock.finance)}
+            ${line("買い条件", stock.buyCondition)}
+          </div>
+          ${stock.memo ? `<div class="memo-box">${escapeHtml(stock.memo)}</div>` : ""}
+          <p class="small">更新: ${escapeHtml(stock.updatedAt || "")}</p>
+          <div class="actions">
+            <button type="button" onclick="editStock('${stock.id}')">編集</button>
+            <button type="button" onclick="copyPrompt('${stock.id}')">調査文コピー</button>
+            <button class="danger" type="button" onclick="deleteStock('${stock.id}')">削除</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function line(label, value) {
+      if (!value) return "";
+      return `<div><b>${label}:</b> ${escapeHtml(value)}</div>`;
+    }
+
+    function statusClass(status) {
+      if (status === "Buy候補") return "buy";
+      if (status === "Hold") return "hold";
+      if (status === "Sell検討") return "sell";
+      return "";
+    }
+
+    function copyPrompt(id) {
+      const stock = loadStocks().find((item) => item.id === id);
+      if (!stock) return;
+
+      const prompt = [
+        stock.ticker + "（" + (stock.company || "会社名不明") + "）について調べてください。",
+        "直近7日以内のニュース、株価変動理由、今後のカタリスト、Bull材料、Bear材料、財務面・増資リスクを整理してください。",
+        "最後に、BioStockに貼り付けやすい更新メモ形式でまとめてください。",
+        "",
+        "現在のメモ:",
+        "疾患領域: " + (stock.area || ""),
+        "主力パイプライン: " + (stock.pipeline || ""),
+        "カタリスト: " + (stock.catalyst || ""),
+        "Bull: " + (stock.bull || ""),
+        "Bear: " + (stock.bear || ""),
+        "財務: " + (stock.finance || ""),
+        "買い条件: " + (stock.buyCondition || "")
+      ].join("\\n");
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(prompt).then(() => {
+          alert("ChatGPT調査用プロンプトをコピーしました。");
+        });
+      } else {
+        window.prompt("この調査文をコピーしてください。", prompt);
+      }
+    }
+
+    function exportJson() {
+      const stocks = loadStocks();
+      const blob = new Blob([JSON.stringify(stocks, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "biostock-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJson(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const imported = JSON.parse(reader.result);
+          if (!Array.isArray(imported)) throw new Error("Invalid JSON");
+          if (!confirm("現在のデータを読み込んだJSONで置き換えますか？")) return;
+          storeStocks(imported);
+          render();
+          resetForm();
+        } catch (error) {
+          alert("JSONを読み込めませんでした。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    render();
+  </script>
 </body>
 </html>
